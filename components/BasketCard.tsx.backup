@@ -1,0 +1,189 @@
+import { useRouter } from 'expo-router'
+import React from 'react'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { theme } from '../constants/theme'
+import { Basket } from '../lib/api'
+import { useAppStore } from '../lib/store'
+import { calculateDiscount, calculateDistance, formatPickupTime, formatPrice } from '../lib/utils'
+
+interface BasketCardProps {
+  basket: Basket
+}
+
+export default function BasketCard({ basket }: BasketCardProps) {
+  const router = useRouter()
+  const currentLocation = useAppStore((state) => state.currentLocation)
+
+  const distance = currentLocation && basket.merchants
+    ? calculateDistance(
+        currentLocation.latitude,
+        currentLocation.longitude,
+        basket.merchants.lat,
+        basket.merchants.lng
+      )
+    : null
+
+  const discount = calculateDiscount(basket.original_price, basket.sale_price)
+
+  const handlePress = () => {
+    router.push({
+      pathname: '/(customer)/basket/[id]',
+      params: { id: basket.id, preset: encodeURIComponent(JSON.stringify(basket)) },
+    } as any)
+  }
+
+  return (
+    <TouchableOpacity style={styles.card} onPress={handlePress}>
+      <Image 
+        source={{ uri: basket.photo_url }} 
+        style={styles.image}
+        resizeMode="cover"
+      />
+      
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text style={styles.title} numberOfLines={2}>
+            {basket.title}
+          </Text>
+          <View style={styles.discountBadge}>
+            <Text style={styles.discountText}>-{discount}%</Text>
+          </View>
+        </View>
+
+        <Text style={styles.description} numberOfLines={2}>
+          {basket.description}
+        </Text>
+
+        <View style={styles.merchantInfo}>
+          <Text style={styles.merchantName}>
+            {basket.merchants?.name}
+          </Text>
+          {distance && (
+            <Text style={styles.distance}>
+              {distance.toFixed(1)} km
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.pricing}>
+          <Text style={styles.originalPrice}>
+            {formatPrice(basket.original_price)}
+          </Text>
+          <Text style={styles.salePrice}>
+            {formatPrice(basket.sale_price)}
+          </Text>
+        </View>
+
+        <View style={styles.footer}>
+          <Text style={styles.pickupTime}>
+            Retrait : {formatPickupTime(basket.pickup_start, basket.pickup_end)}
+          </Text>
+          <Text style={styles.quantity}>
+            {basket.qty_available} disponible{basket.qty_available > 1 ? 's' : ''}
+          </Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  )
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.radius.lg,
+    marginHorizontal: theme.spacing.xl,
+    marginVertical: theme.spacing.md,
+    overflow: 'hidden',
+    ...theme.shadow.card,
+  },
+  image: {
+    width: '100%',
+    height: 200,
+  },
+  content: {
+    padding: theme.spacing.lg,
+    backgroundColor: theme.colors.white,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: theme.spacing.sm,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.text,
+    flex: 1,
+    marginRight: theme.spacing.sm,
+  },
+  discountBadge: {
+    backgroundColor: theme.colors.teal,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.radius.pill,
+  },
+  discountText: {
+    color: theme.colors.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  description: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+    marginBottom: theme.spacing.md,
+    lineHeight: 20,
+  },
+  merchantInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+  },
+  merchantName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text,
+  },
+  distance: {
+    fontSize: 12,
+    color: theme.colors.text,
+    backgroundColor: theme.colors.primaryMuted,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.radius.pill,
+  },
+  pricing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+    gap: theme.spacing.sm,
+  },
+  originalPrice: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+    textDecorationLine: 'line-through',
+  },
+  salePrice: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: theme.colors.teal,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  pickupTime: {
+    fontSize: 12,
+    color: theme.colors.tealDark,
+    backgroundColor: theme.colors.primaryMuted,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: theme.radius.md,
+  },
+  quantity: {
+    fontSize: 12,
+    color: theme.colors.textMuted,
+  },
+}) 

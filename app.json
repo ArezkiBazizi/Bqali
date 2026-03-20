@@ -1,26 +1,45 @@
 {
   "expo": {
-    "name": "bqali",
+    "name": "Bqali",
     "slug": "bqali",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "bqali",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "AIzaSyC-cDjY9uOQcH-LHMqLhyiaFFLW2Q2xpUk"
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Cette app utilise la localisation pour vous montrer les paniers près de chez vous.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Cette app utilise la localisation pour vous montrer les paniers près de chez vous."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFFFFF"
       },
-      "edgeToEdgeEnabled": true
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyC-cDjY9uOQcH-LHMqLhyiaFFLW2Q2xpUk"
+        }
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
-      "bundler": "metro",
-      "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -33,10 +52,22 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-barcode-scanner",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Cette app utilise la localisation pour vous montrer les paniers près de chez vous."
+        }
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "EXPO_PUBLIC_SUPABASE_URL": "https://lczollfftbnurkhxnira.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_YMFhBYqQQOUMXLOGABwW0w_qhYKdqoA"
     }
   }
 }
