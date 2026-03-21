@@ -1,5 +1,5 @@
-import { supabase } from './supabase'
-import { generatePickupCode, generateQRPayload } from './utils'
+import { supabase } from './supabase';
+import { generatePickupCode, generateQRPayload } from './utils';
 
 /** Détaille une erreur d’invoke (status + corps) — le message par défaut est trop vague. */
 async function describeEdgeInvokeError(err: unknown): Promise<string> {
