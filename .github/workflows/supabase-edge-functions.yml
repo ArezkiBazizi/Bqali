@@ -1,5 +1,5 @@
 # Vérifie les Edge Functions (Deno) — aligné avec le runtime Supabase
-name: Supabase Edge Functions
+name: Edge Functions (Deno)
 
 on:
   push:

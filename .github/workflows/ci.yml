@@ -1,4 +1,4 @@
-name: CI
+name: Build & Test
 
 on:
   push:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   lint-and-typecheck:
-    name: Lint & TypeScript
+    name: Lint, ESLint & TypeScript
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
