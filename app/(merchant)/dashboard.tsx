@@ -262,7 +262,7 @@ export default function MerchantDashboard() {
               <Ionicons name="calendar-outline" size={24} color={theme.colors.teal} />
             </View>
             <Text style={styles.statNumber}>{stats.todaySales}</Text>
-            <Text style={styles.statLabel}>Ventes aujourd'hui</Text>
+            <Text style={styles.statLabel}>{`Ventes aujourd'hui`}</Text>
             <View style={styles.statTrend}>
               <Ionicons name="trending-up" size={16} color={theme.colors.success} />
               <Text style={styles.trendText}>+8%</Text>
@@ -274,7 +274,7 @@ export default function MerchantDashboard() {
               <Ionicons name="cash-outline" size={24} color={theme.colors.accent} />
             </View>
             <Text style={styles.statNumber}>{stats.totalRevenue}</Text>
-            <Text style={styles.statLabel}>Chiffre d'affaires</Text>
+            <Text style={styles.statLabel}>{`Chiffre d'affaires`}</Text>
             <View style={styles.statTrend}>
               <Ionicons name="trending-up" size={16} color={theme.colors.success} />
               <Text style={styles.trendText}>+15%</Text>

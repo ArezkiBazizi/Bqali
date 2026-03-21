@@ -89,7 +89,7 @@ export default function Profile() {
       <View style={styles.loadingContainer}>
         <View style={styles.loadingCard}>
           <Ionicons name="person-outline" size={32} color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Vérification de l'authentification...</Text>
+          <Text style={styles.loadingText}>{`Vérification de l'authentification...`}</Text>
         </View>
       </View>
     )
@@ -284,7 +284,7 @@ export default function Profile() {
             </View>
             <View style={styles.actionContent}>
               <Text style={styles.actionTitle}>Mes réservations</Text>
-              <Text style={styles.actionSubtitle}>Voir l'historique de vos commandes</Text>
+              <Text style={styles.actionSubtitle}>{`Voir l'historique de vos commandes`}</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={theme.colors.textMuted} />
           </TouchableOpacity>

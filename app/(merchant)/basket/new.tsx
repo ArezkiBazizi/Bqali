@@ -169,7 +169,7 @@ export default function NewBasket() {
             keyboardType="numeric"
           />
 
-          <Text style={styles.label}>URL de l'image</Text>
+          <Text style={styles.label}>{`URL de l'image`}</Text>
           <TextInput
             style={styles.input}
             placeholder="https://exemple.com/image.jpg"

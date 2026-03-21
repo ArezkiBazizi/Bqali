@@ -177,7 +177,7 @@ export default function ReservationScreen() {
         <Ionicons name="alert-circle-outline" size={64} color={theme.colors.danger} />
         <Text style={styles.errorTitle}>Réservation non trouvée</Text>
         <Text style={styles.errorSubtitle}>
-          Cette réservation n'existe pas ou a été supprimée
+          {`Cette réservation n'existe pas ou a été supprimée`}
         </Text>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <Text style={styles.backBtnText}>Retour</Text>

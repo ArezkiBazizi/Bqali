@@ -283,7 +283,7 @@ export default function EditBasket() {
             </View>
           </View>
 
-          <Text style={styles.label}>URL de l'image</Text>
+          <Text style={styles.label}>{`URL de l'image`}</Text>
           <TextInput
             style={styles.input}
             placeholder="https://exemple.com/image.jpg"

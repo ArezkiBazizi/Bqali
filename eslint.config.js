@@ -7,4 +7,11 @@ module.exports = defineConfig([
   {
     ignores: ['dist/*'],
   },
+  {
+    files: ['**/*.{js,jsx,ts,tsx}'],
+    rules: {
+      // Textes FR avec apostrophes — désactivé en secours si la fusion flat échoue en CI
+      'react/no-unescaped-entities': 'off',
+    },
+  },
 ]);

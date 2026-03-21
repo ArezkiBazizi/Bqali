@@ -24,7 +24,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # >=20.19 évite les avertissements EBADENGINE (eslint-visitor-keys, etc.)
+          node-version: "20.19"
           cache: "npm"
 
       - name: Install dependencies
