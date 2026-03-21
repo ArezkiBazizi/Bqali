@@ -1,6 +1,6 @@
 # Welcome to your Expo app 👋
 
-[![CI](https://github.com/ArezkiBazizi/Bqali/actions/workflows/ci.yml/badge.svg)](https://github.com/ArezkiBazizi/Bqali/actions/workflows/ci.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/ArezkiBazizi/Bqali/ci.yml?branch=main&label=CI&logo=github)](https://github.com/ArezkiBazizi/Bqali/actions)
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
