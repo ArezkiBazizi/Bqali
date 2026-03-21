@@ -15,8 +15,6 @@
 [![Licence](https://img.shields.io/badge/licence-projet%20priv%C3%A9-lightgrey.svg)](#licence)
 [![Stars](https://img.shields.io/github/stars/ArezkiBazizi/Bqali.svg?style=social&label=Stars)](https://github.com/ArezkiBazizi/Bqali/stargazers)
 
-> **Note :** ce dépôt n’utilise pas Java, Gradle, Docker ni SonarCloud (contrairement à un backend JVM classique). Les badges ci‑dessus reflètent la stack **Expo / TypeScript / Supabase**. Pour un badge **SonarCloud** ou **Docker**, il faudrait ajouter le service et le workflow correspondants.
-
 Application mobile et web pour mettre en relation **commerçants** et **clients** autour de **paniers alimentaires** à prix réduit, dans une logique de lutte contre le gaspillage.
 
 ## Description
