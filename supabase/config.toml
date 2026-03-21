@@ -1,0 +1,8 @@
+# Clés « publishable » (sb_publishable_) : le gateway Edge Functions rejette encore la vérif JWT
+# héritée → 401. Désactiver pour cette fonction (voir doc Supabase, function configuration).
+# Obligatoire : redéployer après changement :
+#   supabase functions deploy send-verification-email
+# Ou dans le Dashboard : Edge Functions → send-verification-email → désactiver JWT verification.
+
+[functions.send-verification-email]
+verify_jwt = false

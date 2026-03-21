@@ -136,7 +136,8 @@ export default function MerchantBaskets() {
               Alert.alert('Succès', `Panier ${action}é avec succès`)
             } catch (error) {
               console.error('Erreur lors de la modification:', error)
-              Alert.alert('Erreur', `Impossible de ${action} le panier: ${error.message}`)
+              const msg = error instanceof Error ? error.message : String(error)
+              Alert.alert('Erreur', `Impossible de ${action} le panier: ${msg}`)
             }
           }
         }

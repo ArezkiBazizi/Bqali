@@ -65,4 +65,28 @@ export const isPickupActive = (start: string, end: string): boolean => {
   const endTime = new Date(end)
   
   return now >= startTime && now <= endTime
-} 
+}
+
+/** Texte lisible pour PostgREST / Supabase / erreurs inconnues (évite « Object » en console). */
+export function formatErrorMessage(error: unknown): string {
+  if (error == null) return 'Erreur inconnue'
+  if (typeof error === 'string') return error
+  if (error instanceof Error) return error.message || error.name
+  if (typeof error === 'object') {
+    const o = error as Record<string, unknown>
+    const msg = o.message
+    if (typeof msg === 'string' && msg.length) return msg
+    const details = o.details
+    if (typeof details === 'string' && details.length) return details
+    const hint = o.hint
+    if (typeof hint === 'string' && hint.length) return hint
+    const code = o.code
+    if (typeof code === 'string' && code.length) return `Erreur ${code}`
+    try {
+      return JSON.stringify(error)
+    } catch {
+      return String(error)
+    }
+  }
+  return String(error)
+}

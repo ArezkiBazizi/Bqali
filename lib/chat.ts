@@ -42,6 +42,9 @@ export interface Message {
   metadata?: any
   created_at: string
   read_at?: string
+  file_url?: string
+  file_name?: string
+  file_size?: number
   sender?: {
     id: string
     email: string
@@ -231,4 +234,19 @@ export const markMessagesAsRead = async (conversationId: string, userId: string)
     console.error('Erreur dans markMessagesAsRead:', error)
     throw error
   }
+}
+
+/** Facade utilisée par les composants (`ChatScreen`, `ConversationList`) */
+export const chatApi = {
+  getUserConversations: getConversations,
+  getConversationMessages: getMessages,
+  markMessagesAsRead,
+  sendMessage: async (
+    conversationId: string,
+    senderId: string,
+    senderType: 'customer' | 'merchant',
+    content: string,
+    _messageType?: 'text' | 'image' | 'file',
+    ..._extra: unknown[]
+  ): Promise<Message> => sendMessage(conversationId, senderId, senderType, content),
 } 

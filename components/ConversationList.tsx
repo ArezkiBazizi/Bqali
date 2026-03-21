@@ -3,8 +3,7 @@ import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { theme } from '../constants/theme'
-import { chatApi } from '../lib/chat'
-import { Conversation } from '../types/chat'
+import { chatApi, Conversation } from '../lib/chat'
 
 interface ConversationListProps {
   userId: string
@@ -80,7 +79,7 @@ export default function ConversationList({ userId, userType }: ConversationListP
 
         <Text style={[
           styles.lastMessage,
-          item.unread_count && item.unread_count > 0 && styles.unreadMessage
+          (item.unread_count ?? 0) > 0 && styles.unreadMessage
         ]} numberOfLines={2}>
           {item.last_message?.content || 'Aucun message'}
         </Text>

@@ -1,4 +1,4 @@
-﻿import { Ionicons } from '@expo/vector-icons'
+import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
@@ -11,17 +11,30 @@ export default function FooterBar() {
 
   useEffect(() => {
     const getUserRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
+      try {
+        // getSession = moins de contention que getUser avec le verrou auth (Expo Web)
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) throw sessionError
+        const user = session?.user
+        if (!user) return
+
         const { data: profile } = await supabase
           .from('users')
           .select('role')
           .eq('id', user.id)
           .single()
         setUserRole(profile?.role || 'customer')
+      } catch (e: unknown) {
+        const name = e && typeof e === 'object' && 'name' in e ? (e as { name: string }).name : ''
+        if (name === 'AbortError') return
+        console.warn('FooterBar: rôle utilisateur indisponible', e)
       }
     }
-    getUserRole()
+    void getUserRole().catch((e: unknown) => {
+      const name = e && typeof e === 'object' && 'name' in e ? (e as { name: string }).name : ''
+      if (name === 'AbortError') return
+      console.warn('FooterBar: getUserRole', e)
+    })
   }, [])
 
   const tabs = [

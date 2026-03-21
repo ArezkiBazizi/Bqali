@@ -21,6 +21,7 @@ import MapViewComponent from '../../components/MapView'
 import FooterBar from '../../components/ui/FooterBar'
 import { theme } from '../../constants/theme'
 import { api, Basket } from '../../lib/api'
+import { formatErrorMessage } from '../../lib/utils'
 
 const { width, height } = Dimensions.get('window')
 
@@ -64,7 +65,8 @@ export default function Home() {
         }
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des paniers:', error)
+      const message = formatErrorMessage(error)
+      console.error('Erreur lors du chargement des paniers:', message)
       setBaskets([])
     } finally {
       setLoading(false)

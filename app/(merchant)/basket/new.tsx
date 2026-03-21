@@ -100,7 +100,8 @@ export default function NewBasket() {
       ])
     } catch (error) {
       console.error('Erreur lors de la création:', error)
-      Alert.alert('Erreur', `Impossible de créer le panier: ${error.message}`)
+      const msg = error instanceof Error ? error.message : String(error)
+      Alert.alert('Erreur', `Impossible de créer le panier: ${msg}`)
     } finally {
       setLoading(false)
     }

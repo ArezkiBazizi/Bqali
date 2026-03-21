@@ -20,6 +20,12 @@ serve(async (req) => {
       throw new Error('RESEND_API_KEY manquante (secret Supabase Edge Functions).')
     }
 
+    // noreply@bqali.com nécessite que bqali.com soit vérifié sur https://resend.com/domains (sinon 403).
+    // Secret optionnel : RESEND_FROM = "BQALI <noreply@bqali.com>" une fois le domaine vérifié.
+    // Sinon : adresse de test Resend (domaine déjà autorisé par Resend).
+    const fromAddress =
+      Deno.env.get('RESEND_FROM')?.trim() || 'BQALI <onboarding@resend.dev>'
+
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -27,7 +33,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'BQALI <noreply@bqali.com>',
+        from: fromAddress,
         to: [email],
         subject: `Confirmez votre réservation - Code: ${verificationCode}`,
         html: `
@@ -93,7 +99,15 @@ serve(async (req) => {
     })
 
     if (!emailResponse.ok) {
-      throw new Error(`Erreur envoi email: ${emailResponse.statusText}`)
+      let details = ''
+      try {
+        details = await emailResponse.text()
+      } catch {
+        details = ''
+      }
+      throw new Error(
+        `Erreur Resend: ${emailResponse.status} ${emailResponse.statusText}${details ? ` - ${details}` : ''}`
+      )
     }
 
     return new Response(
@@ -104,10 +118,11 @@ serve(async (req) => {
       }
     )
 
-  } catch (error) {
-    console.error('Erreur:', error)
+  } catch (error: any) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    console.error('Erreur:', errMsg)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errMsg }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 

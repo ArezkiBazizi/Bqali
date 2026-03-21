@@ -1,6 +1,23 @@
 import { supabase } from './supabase'
 import { generatePickupCode, generateQRPayload } from './utils'
 
+/** Détaille une erreur d’invoke (status + corps) — le message par défaut est trop vague. */
+async function describeEdgeInvokeError(err: unknown): Promise<string> {
+  const e = err as { name?: string; message?: string; context?: Response }
+  if (e?.name === 'FunctionsHttpError' && e.context?.status != null) {
+    let body = ''
+    try {
+      body = (await e.context.text()).trim()
+    } catch {
+      /* ignore */
+    }
+    const short = body.length > 900 ? `${body.slice(0, 900)}…` : body
+    return `Edge Function HTTP ${e.context.status}${short ? ` — ${short}` : ''}`
+  }
+  if (err instanceof Error && err.message) return err.message
+  return 'Edge function error'
+}
+
 // Types
 export interface Basket {
   id: string
@@ -13,6 +30,8 @@ export interface Basket {
   pickup_start: string
   pickup_end: string
   photo_url: string
+  /** Optionnel — utilisé par les filtres de recherche */
+  category?: string
   status: 'active' | 'soldout' | 'expired'
   created_at: string
   merchants?: {
@@ -47,87 +66,30 @@ export const api = {
   // Baskets
   getActiveBaskets: async () => {
     try {
-      console.log('=== DÉBUT getActiveBaskets ===')
-      
-      // TEST 1: Récupérer TOUS les marchands d'abord
-      const { data: allMerchants, error: allMerchantsError } = await supabase
-        .from('merchants')
-        .select('*')
-      
-      console.log('TEST 1 - TOUS les marchands:', allMerchants)
-      console.log('TEST 1 - Erreur:', allMerchantsError)
-      
-      // TEST 2: Essayer avec le schéma public
-      const { data: allMerchantsPublic, error: allMerchantsPublicError } = await supabase
-        .from('public.merchants')
-        .select('*')
-      
-      console.log('TEST 2 - Marchands avec schéma public:', allMerchantsPublic)
-      console.log('TEST 2 - Erreur:', allMerchantsPublicError)
-      
-      // TEST 3: Essayer de récupérer juste le count
-      const { count: merchantsCount, error: countError } = await supabase
-        .from('merchants')
-        .select('*', { count: 'exact', head: true })
-      
-      console.log('TEST 3 - Nombre de marchands:', merchantsCount)
-      console.log('TEST 3 - Erreur count:', countError)
-      
-      // Récupérer d'abord les paniers
-      const { data: baskets, error: basketsError } = await supabase
+      const { data: rows, error } = await supabase
         .from('baskets')
-        .select('*')
+        .select(
+          `
+          *,
+          merchants (
+            id,
+            name,
+            lat,
+            lng,
+            address,
+            city,
+            owner_id
+          )
+        `
+        )
         .eq('status', 'active')
         .order('created_at', { ascending: false })
-      
-      if (basketsError) {
-        console.log('Erreur baskets:', basketsError)
-        throw basketsError
-      }
-      
-      console.log('Paniers récupérés:', baskets?.length)
-      
-      // Récupérer les marchands correspondants
-      const merchantIds = baskets?.map(basket => basket.merchant_id).filter(Boolean) || []
-      
-      console.log('IDs des marchands demandés:', merchantIds)
-      
-      if (merchantIds.length === 0) {
-        console.log('Aucun merchant_id trouvé')
-        return baskets as Basket[]
-      }
-      
-      // JOINTURE : Récupérer les marchands avec leurs IDs
-      const { data: merchants, error: merchantsError } = await supabase
-        .from('merchants')
-        .select('id, name, lat, lng, address, city, owner_id')
-        .in('id', merchantIds)
-      
-      if (merchantsError) {
-        console.log('Erreur merchants:', merchantsError)
-        throw merchantsError
-      }
-      
-      console.log('Marchands récupérés:', merchants)
-      console.log('Nombre de marchands récupérés:', merchants?.length)
-      
-      // JOINTURE : Pour chaque panier, trouver le marchand correspondant
-      const basketsWithMerchants = baskets?.map(basket => {
-        // Jointure : merchant_id du panier = id du marchand
-        const merchant = merchants?.find(merchant => merchant.id === basket.merchant_id)
-        
-        console.log(`JOINTURE: Panier ${basket.id} -> merchant_id: ${basket.merchant_id} -> Marchand trouvé:`, merchant)
-        
-        return {
-          ...basket,
-          merchants: merchant || null
-        }
-      })
-      
-      console.log('=== FIN getActiveBaskets ===')
-      return basketsWithMerchants as Basket[]
+
+      if (error) throw error
+
+      return (rows ?? []) as Basket[]
     } catch (error) {
-      console.log('ERREUR dans getActiveBaskets:', error)
+      console.warn('getActiveBaskets:', error)
       throw error
     }
   },
@@ -275,9 +237,9 @@ export const api = {
     })
 
     if (invokeError) {
-      // Si l'email échoue, on remonte l'erreur pour que l'utilisateur sache que la vérification email n'est pas partie.
-      // (Optionnel: on pourrait mettre le statut à une valeur "email_failed" côté DB.)
-      throw invokeError
+      const detail = await describeEdgeInvokeError(invokeError)
+      console.error('Edge function invoke error:', detail, invokeError)
+      throw new Error(detail)
     }
 
     return reservation
@@ -505,7 +467,11 @@ export const api = {
           },
         })
 
-        if (invokeError) throw invokeError
+        if (invokeError) {
+          const detail = await describeEdgeInvokeError(invokeError)
+          console.error('Edge function invoke error:', detail, invokeError)
+          throw new Error(detail)
+        }
       }
     } catch (emailError) {
       console.error('Erreur envoi email:', emailError)

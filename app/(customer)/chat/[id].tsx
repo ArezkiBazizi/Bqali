@@ -67,7 +67,7 @@ export default function ChatScreen() {
       setMessages(messagesData)
 
       // Marquer les messages comme lus
-      await markMessagesAsRead(id!, user.id, 'customer')
+      await markMessagesAsRead(id!, user.id)
     } catch (error) {
       console.error('Erreur lors du chargement:', error)
     } finally {

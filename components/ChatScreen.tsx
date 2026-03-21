@@ -15,8 +15,7 @@ import {
     View
 } from 'react-native'
 import { theme } from '../constants/theme'
-import { chatApi } from '../lib/chat'
-import { Conversation, Message } from '../types/chat'
+import { chatApi, Conversation, Message } from '../lib/chat'
 
 interface ChatScreenProps {
   conversationId: string

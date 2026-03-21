@@ -39,25 +39,32 @@ export default function RootLayout() {
       }
     })
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user)
-        
-        // Récupérer le rôle de l'utilisateur
-        const { data: profile } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', session.user.id)
-          .single()
+    supabase.auth
+      .getSession()
+      .then(async ({ data: { session } }) => {
+        if (session?.user) {
+          setUser(session.user)
 
-        if (profile) {
-          setUserRole(profile.role)
+          // Récupérer le rôle de l'utilisateur
+          const { data: profile } = await supabase
+            .from('users')
+            .select('role')
+            .eq('id', session.user.id)
+            .single()
+
+          if (profile) {
+            setUserRole(profile.role)
+          }
+
+          const token = await registerForPushNotificationsAsync()
+          if (token) await upsertUserPushToken(session.user.id, token)
         }
-        
-        const token = await registerForPushNotificationsAsync()
-        if (token) await upsertUserPushToken(session.user.id, token)
-      }
-    })
+      })
+      .catch((e: unknown) => {
+        const name = e && typeof e === 'object' && 'name' in e ? (e as { name: string }).name : ''
+        if (name === 'AbortError') return
+        console.warn('Session init:', e)
+      })
 
     return () => {
       authListener?.subscription?.unsubscribe?.()
